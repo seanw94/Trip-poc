@@ -55,6 +55,12 @@ func _ready() -> void:
 	game.show_rules()
 	await _settle(0.5)
 	await _shot("07_rules")
+	game.rules_scroll.scroll_vertical = 1150
+	await _settle(0.2)
+	await _shot("07b_rules_middle")
+	game.rules_scroll.scroll_vertical = 100000
+	await _settle(0.2)
+	await _shot("07c_rules_end")
 	game.close_overlay()
 
 	game.show_water_break()

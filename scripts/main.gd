@@ -86,6 +86,7 @@ var reveal_rule: Label
 
 var overlay: Control = null
 var rules_layer: Control
+var rules_scroll: ScrollContainer
 var banzuke_layer: Control
 var banzuke_rows: VBoxContainer
 var water_layer: Control
@@ -280,6 +281,7 @@ func total_drinks() -> int:
 
 
 func show_rules() -> void:
+	rules_scroll.scroll_vertical = 0
 	_open_overlay(rules_layer)
 
 
@@ -576,6 +578,7 @@ func _layout() -> void:
 		lanterns[0].position = Vector2(70, 0)
 		lanterns[1].position = Vector2(view.x - 70, 0)
 	confetti.position = Vector2(view.x * 0.5, view.y * 0.42)
+	rules_scroll.custom_minimum_size.y = maxf(view.y - 420.0, 400.0)
 
 
 func _vibrate(ms: int) -> void:
@@ -736,7 +739,7 @@ func _build_title() -> Control:
 	box.add_child(UI.spacer(6))
 	box.add_child(_btn("ふたりで差し向かい", 40, func(): open_setup(2, true), 440))
 	box.add_child(UI.spacer(6))
-	box.add_child(_btn("遊び方", 28, show_rules, 220))
+	box.add_child(_btn("遊び方 / Rules", 28, show_rules, 320))
 	box.add_child(UI.spacer(14))
 	box.add_child(UI.label("お酒は20歳になってから。飲みすぎ注意、お水もどうぞ。", UI.BODY_FONT, 22, Color(UI.CREAM, 0.65)))
 	version_label = UI.label("v" + str(ProjectSettings.get_setting("application/config/version", "dev")),
@@ -813,6 +816,10 @@ func _build_hud() -> Control:
 	top.add_child(members)
 	top.add_child(UI.expand())
 	top.get_child(1).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(_btn("遊び方 / Rules", 22, show_rules, 0))
+	var spacer := UI.expand()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(spacer)
 	var ranking := _btn("番付", 24, show_banzuke, 0)
 	top.add_child(ranking)
 	box.add_child(top)
@@ -858,40 +865,141 @@ func _build_reveal() -> void:
 
 
 func _build_rules() -> void:
-	var parts := UI.overlay(self, RULES_COLOR, 640)
+	var parts := UI.overlay(self, RULES_COLOR, 660)
 	rules_layer = parts[0]
 	var box: VBoxContainer = parts[3]
-	box.add_child(UI.label("遊び方", UI.TITLE_FONT, 60, UI.GOLD, 12))
-	var steps := "\n".join([
-		"① 輪になって、スマホを真ん中に。",
-		"② 番の人がコマをシュッと回す。",
-		"　 回ってる間は「べろべろの神様」を",
-		"　 みんなで歌おう！",
-		"③ 軸の先の人が、出た顔の杯で飲む。",
-		"④ 飲んだ人が次に回す。",
+	box.add_child(UI.label("遊び方 / Rules", UI.TITLE_FONT, 52, UI.GOLD, 12))
+	rules_scroll = ScrollContainer.new()
+	rules_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	rules_scroll.custom_minimum_size = Vector2(0, 760)
+	box.add_child(rules_scroll)
+	var page := VBoxContainer.new()
+	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	page.add_theme_constant_override("separation", 10)
+	rules_scroll.add_child(page)
+
+	_rules_heading(page, "日本語")
+	_rules_text(page, "スマホを真ん中に置いて、みんなで輪になって座ろう。")
+	_rules_steps(page, [
+		"番の人が、コマを指でシュッと回す。（「回す！」ボタンでもOK）",
+		"回っている間、みんなで「べろべろの神様」を歌う。歌詞は画面に出るよ。",
+		"コマが倒れたら、軸（長い棒）の先にいる人が飲む。",
+		"真ん中に出た顔で、どの杯かが決まる。",
+		"飲んだら「飲んだ！」。飲めない時は「お水でパス」でOK。",
+		"飲んだ人が、次にコマを回す。",
 	])
-	var body := UI.label(steps, UI.BODY_FONT, 28, UI.CREAM)
-	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	box.add_child(body)
-	box.add_child(UI.spacer(6))
-	var cups := UI.hbox(14)
+	_rules_cups(page, ["おかめ", "ひょっとこ", "天狗"], [
+		"いちばん小さい。唯一テーブルに置ける杯。",
+		"口に穴あり。指でふさいで、飲み干すまで置けない。",
+		"いちばん大きい。鼻が長くて、飲み干すまで置けない。",
+	])
+	_rules_text(page, "本物の杯がなければ、小・中・大のグラスでOK。", 24, 0.75)
+	_rules_subheading(page, "オプション")
+	_rules_text(page, "・指名モード：回す前に「この人に当たる！」と思う人をタップ。当たればその人が、外れたら自分が飲む。\n・向かい合わせ：スマホを卓に置く用。名前と結果がそれぞれの席の向きに表示される。")
+	_rules_subheading(page, "サプライズ")
+	_rules_text(page, "・全員カンパイ：みんなで飲む！\n・道連れ：もう一人、ランダムに一緒に飲む。")
+	_rules_text(page, "「番付」で今夜のランキング、「メンバー」で人数・名前を変更できます。", 24, 0.75)
+	_rules_text(page, "お酒は20歳になってから。無理に飲ませない、飲まない。お水もはさんでね。", 24, 0.75)
+
+	page.add_child(UI.spacer(10))
+	_rules_heading(page, "English")
+	_rules_text(page, "Put the phone in the middle and sit around it in a circle.")
+	_rules_steps(page, [
+		"On your turn (番), flick the top with your finger — or tap 回す！ (Spin).",
+		"While it spins, everyone sings the 「べろべろの神様」 chant. The words appear on screen.",
+		"When the top falls over, whoever the long stick points at drinks.",
+		"The face that shows in the middle decides which cup.",
+		"Tap 飲んだ！ (Drank!) when done. Can't drink? Tap お水でパス (Pass with water) — that's fine.",
+		"Whoever drank spins next.",
+	])
+	_rules_cups(page, ["Okame", "Hyottoko", "Tengu"], [
+		"Smallest. The only cup you can put down.",
+		"Hole in the mouth. Cover it with a finger; you can't put it down until it's empty.",
+		"Biggest. Its long nose means you can't put it down until it's empty.",
+	])
+	_rules_text(page, "No real bekuhai cups? Use a small, medium and large glass.", 24, 0.75)
+	_rules_subheading(page, "Options")
+	_rules_text(page, "• 指名モード (Call it): before spinning, tap the person you think it will point at. Right — they drink. Wrong — you drink.\n• 向かい合わせ (Face to face): for a phone lying on the table. Names and results turn to face each player.")
+	_rules_subheading(page, "Surprises")
+	_rules_text(page, "• 全員カンパイ (Everyone drinks!)\n• 道連れ (Buddy): a random second player drinks too.")
+	_rules_text(page, "番付 shows tonight's ranking; メンバー changes players and names.", 24, 0.75)
+	_rules_text(page, "Drinking age in Japan is 20. Never pressure anyone to drink, and have water in between.", 24, 0.75)
+
+	box.add_child(UI.label("上下にスクロール / Scroll for more", UI.BODY_FONT, 20, Color(UI.CREAM, 0.5)))
+	box.add_child(_btn("閉じる / Close", 30, close_overlay, 320))
+
+
+func _rules_heading(page: VBoxContainer, text: String) -> void:
+	var l := UI.label(text, UI.TITLE_FONT, 40, UI.CREAM, 10)
+	page.add_child(l)
+	var line := ColorRect.new()
+	line.color = Color(UI.GOLD, 0.6)
+	line.custom_minimum_size = Vector2(0, 3)
+	page.add_child(line)
+
+
+func _rules_subheading(page: VBoxContainer, text: String) -> void:
+	var l := UI.label(text, UI.TITLE_FONT, 28, UI.GOLD, 6)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	page.add_child(l)
+
+
+func _rules_text(page: VBoxContainer, text: String, font_size := 26, alpha := 1.0) -> void:
+	var l := UI.label(text, UI.BODY_FONT, font_size, Color(UI.CREAM, alpha))
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	page.add_child(l)
+
+
+func _rules_steps(page: VBoxContainer, steps: Array) -> void:
+	for i in steps.size():
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		var num := UI.label(str(i + 1), UI.TITLE_FONT, 28, UI.INK)
+		num.custom_minimum_size = Vector2(44, 44)
+		var badge := PanelContainer.new()
+		var style := UI.box(UI.GOLD, UI.GOLD, 0, 22)
+		style.set_content_margin_all(0)
+		badge.add_theme_stylebox_override("panel", style)
+		badge.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		badge.add_child(num)
+		row.add_child(badge)
+		var l := UI.label(steps[i], UI.BODY_FONT, 26, UI.CREAM)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		l.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(l)
+		page.add_child(row)
+
+
+func _rules_cups(page: VBoxContainer, cup_names: Array, notes: Array) -> void:
 	for f in 3:
-		var col := VBoxContainer.new()
-		col.add_theme_constant_override("separation", 2)
+		var row := PanelContainer.new()
+		var style := UI.box(Color(CARD_COLORS[f], 0.45), Color(CARD_COLORS[f]).lightened(0.3), 2, 18)
+		style.set_content_margin_all(10)
+		row.add_theme_stylebox_override("panel", style)
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 14)
+		row.add_child(h)
 		var fv = FaceView.new()
 		fv.face = f
-		fv.custom_minimum_size = Vector2(120, 120)
-		fv.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		col.add_child(fv)
-		col.add_child(UI.label(Faces.NAMES[f], UI.TITLE_FONT, 26, UI.GOLD, 6))
-		col.add_child(UI.label(["小・置ける", "中・穴あき", "大・置けない"][f], UI.BODY_FONT, 22, UI.CREAM))
-		cups.add_child(col)
-	box.add_child(cups)
-	box.add_child(UI.spacer(6))
-	var extra := UI.label("指名モード：回す前に飲ませたい人を指名。\n当たれば指名された人、外れたら自分が飲む。\nまれに「全員カンパイ」や「道連れ」も…！", UI.BODY_FONT, 22, Color(UI.CREAM, 0.8))
-	box.add_child(extra)
-	box.add_child(UI.spacer(10))
-	box.add_child(_btn("閉じる", 34, close_overlay, 260))
+		fv.custom_minimum_size = Vector2(96, 96)
+		fv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		h.add_child(fv)
+		var text := VBoxContainer.new()
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		text.add_theme_constant_override("separation", 2)
+		var title := UI.label(cup_names[f], UI.TITLE_FONT, 28, UI.GOLD, 6)
+		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		text.add_child(title)
+		var note := UI.label(notes[f], UI.BODY_FONT, 24, UI.CREAM)
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		text.add_child(note)
+		h.add_child(text)
+		page.add_child(row)
 
 
 func _build_banzuke() -> void:
