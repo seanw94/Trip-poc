@@ -104,6 +104,20 @@ jobs:
           path: build/bekuhai.apk
           retention-days: 14
 
+      # Same build plus x86_64 code, only for the emulator launch check below.
+      - name: Export emulator APK
+        run: |
+          sed -i "s/^architectures\/x86_64=.*/architectures\/x86_64=true/" export_presets.cfg
+          timeout 600 godot --headless --path . --export-debug "Android" build/bekuhai-x86_64.apk > /dev/null 2>&1
+          git checkout export_presets.cfg
+          test -f build/bekuhai-x86_64.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: emulator-apk
+          path: build/bekuhai-x86_64.apk
+          retention-days: 3
+
       # Real rendering (software OpenGL under a virtual display) of the main
       # screens, for checking the look without a phone.
       - name: Render screenshots
@@ -134,3 +148,60 @@ jobs:
           git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" \
             commit -q -m "Screenshots for ${GITHUB_SHA}"
           git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" ci-screenshots
+
+  # Boots an Android emulator, installs the build and launches it: catches
+  # crashes on real Android that the desktop smoke test can't see.
+  android-launch:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: emulator-apk
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Launch on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: |
+            mkdir -p android
+            adb install -r bekuhai-x86_64.apk
+            adb logcat -c
+            adb shell monkey -p com.seanw94.bekuhai -c android.intent.category.LAUNCHER 1
+            sleep 20
+            adb exec-out screencap -p > android/android_title.png
+            adb shell pidof com.seanw94.bekuhai > android/pid.txt || echo "NOT RUNNING" > android/pid.txt
+            adb logcat -d > android/logcat.txt
+            cat android/pid.txt
+            grep -E "FATAL EXCEPTION|SCRIPT ERROR|Fatal signal" android/logcat.txt || echo "no crash markers in logcat"
+
+      - name: Check the app stayed up
+        run: |
+          grep -qv "NOT RUNNING" android/pid.txt
+          ! grep -qE "FATAL EXCEPTION|Fatal signal" android/logcat.txt
+
+      - name: Add the emulator screenshot to the ci-screenshots branch
+        if: always()
+        continue-on-error: true
+        run: |
+          test -f android/android_title.png || exit 0
+          git clone -q --depth 1 -b ci-screenshots "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" pub
+          cp android/android_title.png pub/
+          grep -iE "godot|bekuhai|FATAL|AndroidRuntime" android/logcat.txt | tail -200 > pub/android_logcat.txt || true
+          cd pub
+          git add .
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" \
+            commit -q -m "Emulator launch for ${GITHUB_SHA}"
+          git push -q origin ci-screenshots

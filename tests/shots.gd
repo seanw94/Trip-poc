@@ -32,6 +32,12 @@ func _ready() -> void:
 	game.spin_with(32.0)
 	await _settle(0.7)
 	await _shot("04_spinning")
+	Engine.time_scale = 6.0
+	while not game.koma.show_face:
+		await get_tree().process_frame
+	Engine.time_scale = 1.0
+	await _settle(0.15)
+	await _shot("04b_toppled")
 	await _until_reveal()
 	await _settle(0.8)
 	await _shot("05_reveal")
@@ -59,7 +65,8 @@ func _ready() -> void:
 	game.set_option("declare", true)
 	game.open_setup(2, true)
 	game.start_play()
-	game.declare(1)
+	# name the top player: hit or miss, the top player drinks, so the card must flip
+	game.declare(0)
 	await _settle(0.5)
 	await _shot("09_duo_declared")
 	game.spin_with(30.0)

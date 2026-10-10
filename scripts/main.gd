@@ -749,7 +749,7 @@ func _build_title() -> Control:
 func _build_setup() -> Control:
 	var root := UI.full_rect(self)
 	var box := UI.vbox(root, 36, 10)
-	box.add_child(UI.spacer(30))
+	box.add_child(UI.expand())
 	box.add_child(UI.label("何人で飲む？", UI.TITLE_FONT, 58, UI.GOLD, 14))
 	var row := UI.hbox(24)
 	var minus := _btn("－", 56, func(): _set_count(player_count - 1), 110)
