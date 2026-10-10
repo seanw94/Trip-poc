@@ -25,6 +25,12 @@ jobs:
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon
 
+      # Should print the same SHA-256 on every run (the committed debug key).
+      - name: Show signing certificate
+        run: |
+          apksigner=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs app/build/outputs/apk/debug/app-debug.apk
+
       - uses: actions/upload-artifact@v4
         with:
           name: tanuki-poc-debug
