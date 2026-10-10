@@ -73,8 +73,10 @@ var _last_drag := 0.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# names with kanji the display font lacks fall back to the body font
+	var title_font: FontFile = TITLE_FONT
 	var fallbacks: Array[Font] = [BODY_FONT]
-	TITLE_FONT.fallbacks = fallbacks
+	title_font.fallbacks = fallbacks
 	theme = _make_theme()
 	DisplayServer.screen_set_keep_on(true)
 	_load()

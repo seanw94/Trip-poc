@@ -68,7 +68,9 @@ jobs:
           done
 
       - name: Import project
-        run: timeout 300 godot --headless --path bekuhai --import
+        run: |
+          timeout 300 godot --headless --path bekuhai --import 2>&1 | tee import.log
+          if grep -E "SCRIPT ERROR|Parse Error" import.log; then exit 1; fi
 
       # Plays three full rounds headless; fails on script errors or a stall.
       - name: Smoke test

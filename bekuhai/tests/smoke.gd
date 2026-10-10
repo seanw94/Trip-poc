@@ -9,6 +9,9 @@ func _ready() -> void:
 	Engine.time_scale = 8.0
 	var game = load("res://main.tscn").instantiate()
 	add_child(game)
+	if not game.has_method("start_play"):
+		_fail("main.gd failed to load")
+		return
 	await get_tree().process_frame
 	game.show_setup()
 	game.set_player_count(3)
