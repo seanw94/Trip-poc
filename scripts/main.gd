@@ -881,7 +881,7 @@ func _build_rules() -> void:
 	_rules_heading(page, "日本語")
 	_rules_text(page, "スマホを真ん中に置いて、みんなで輪になって座ろう。")
 	_rules_steps(page, [
-		"番の人が、コマを指でシュッと回す。（「回す！」ボタンでもOK）",
+		"番の人が、コマを指でシュッと回す。\n（「回す！」ボタンでもOK）",
 		"回っている間、みんなで「べろべろの神様」を歌う。歌詞は画面に出るよ。",
 		"コマが倒れたら、軸（長い棒）の先にいる人が飲む。",
 		"真ん中に出た顔で、どの杯かが決まる。",
@@ -905,11 +905,11 @@ func _build_rules() -> void:
 	_rules_heading(page, "English")
 	_rules_text(page, "Put the phone in the middle and sit around it in a circle.")
 	_rules_steps(page, [
-		"On your turn (番), flick the top with your finger — or tap 回す！ (Spin).",
+		"On your turn (番), flick the top with your finger, or tap 回す！ (Spin).",
 		"While it spins, everyone sings the 「べろべろの神様」 chant. The words appear on screen.",
 		"When the top falls over, whoever the long stick points at drinks.",
 		"The face that shows in the middle decides which cup.",
-		"Tap 飲んだ！ (Drank!) when done. Can't drink? Tap お水でパス (Pass with water) — that's fine.",
+		"Tap 飲んだ！ (Drank!) when done. Can't drink? Tap お水でパス (Pass with water). That's fine.",
 		"Whoever drank spins next.",
 	])
 	_rules_cups(page, ["Okame", "Hyottoko", "Tengu"], [
@@ -919,7 +919,7 @@ func _build_rules() -> void:
 	])
 	_rules_text(page, "No real bekuhai cups? Use a small, medium and large glass.", 24, 0.75)
 	_rules_subheading(page, "Options")
-	_rules_text(page, "• 指名モード (Call it): before spinning, tap the person you think it will point at. Right — they drink. Wrong — you drink.\n• 向かい合わせ (Face to face): for a phone lying on the table. Names and results turn to face each player.")
+	_rules_text(page, "• 指名モード (Call it): before spinning, tap the person you think it will point at. Right: they drink. Wrong: you drink.\n• 向かい合わせ (Face to face): for a phone lying on the table. Names and results turn to face each player.")
 	_rules_subheading(page, "Surprises")
 	_rules_text(page, "• 全員カンパイ (Everyone drinks!)\n• 道連れ (Buddy): a random second player drinks too.")
 	_rules_text(page, "番付 shows tonight's ranking; メンバー changes players and names.", 24, 0.75)

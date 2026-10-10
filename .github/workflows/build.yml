@@ -160,6 +160,8 @@ jobs:
     env:
       # The emulator's default SwiftShader GL has a uniform limit too low for
       # Godot's canvas shader (grey screen); ANGLE renders it like a phone does.
+      # "-qemu -cpu host" passes the host's CPU features through: on some CI
+      # hosts the default virtual CPU lacks instructions Godot's x86_64 build uses.
       GPU: angle_indirect
     steps:
       - uses: actions/download-artifact@v4
@@ -179,10 +181,11 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_6
-          emulator-options: -no-window -gpu ${{ env.GPU }} -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-window -gpu ${{ env.GPU }} -noaudio -no-boot-anim -camera-back none -qemu -cpu host
           disable-animations: true
           script: |
             mkdir -p android
+            adb shell grep -m1 flags /proc/cpuinfo > android/cpuflags.txt || true
             adb install -r bekuhai-x86_64.apk
             adb logcat -c
             adb shell monkey -p com.seanw94.bekuhai -c android.intent.category.LAUNCHER 1
@@ -208,6 +211,7 @@ jobs:
             rm -rf pub
             git clone -q --depth 1 -b ci-screenshots "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" pub
             cp android/android_title.png "pub/android_${gpu}.png"
+            cp android/cpuflags.txt pub/ 2>/dev/null || true
             grep -iE "godot|bekuhai|FATAL|AndroidRuntime" android/logcat.txt | tail -200 > "pub/android_${gpu}_logcat.txt" || true
             (cd pub && git add . && git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" \
               commit -q -m "Emulator launch (${gpu}) for ${GITHUB_SHA}" && git push -q origin ci-screenshots) && break
