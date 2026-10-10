@@ -30,6 +30,7 @@ const CARD_COLORS := [Color("#c2456b"), Color("#2f5ea8"), Color("#a3172b")]
 const KANPAI_COLOR := Color("#9a6b12")
 const WATER_COLOR := Color("#1f6f8b")
 const RULES_COLOR := Color("#3b2a55")
+const TOGGLE_LABELS := {"declare": "指名モード", "table": "向かい合わせ", "sound": "効果音", "vibe": "バイブ"}
 
 var state := State.TITLE
 var player_count := 4
@@ -56,6 +57,7 @@ var _since_water := 0
 var world: Node2D
 var table
 var koma
+var koma_root: Node2D
 var sfx
 var seats: Array = []
 var seat_centers: Array[Vector2] = []
@@ -74,7 +76,7 @@ var spin_button: Button
 var version_label: Label
 
 var reveal: Control
-var reveal_card: PanelContainer
+var reveal_card: Control
 var reveal_style: StyleBoxFlat
 var reveal_banner: Label
 var face_view
@@ -87,7 +89,6 @@ var rules_layer: Control
 var banzuke_layer: Control
 var banzuke_rows: VBoxContainer
 var water_layer: Control
-var water_card: PanelContainer
 
 var _shake := 0.0
 var _touch := -1
@@ -97,6 +98,7 @@ var _drag_speed := 0.0
 var _last_drag := 0.0
 var _beat := 0
 var _chant_word := ""
+var force_bonus := ""  # tests/shots.gd sets this to capture the rare events
 
 
 func _ready() -> void:
@@ -127,8 +129,10 @@ func _ready() -> void:
 		world.add_child(seat)
 		seats.append(seat)
 		seat_centers.append(Vector2.ZERO)
+	koma_root = Node2D.new()
+	world.add_child(koma_root)
 	koma = Koma.new()
-	world.add_child(koma)
+	koma_root.add_child(koma)
 	koma.connect("ticked", _on_tick)
 	koma.connect("landed", _on_landed)
 	koma.connect("rolled", _on_rolled)
@@ -316,6 +320,7 @@ func _enter(s: State) -> void:
 	if s != State.SPINNING:
 		beat_timer.stop()
 	_touch = -1
+	_layout()
 	_update_hint()
 
 
@@ -417,6 +422,10 @@ func _resolve(face: int) -> void:
 	else:
 		drinkers.append(pointed)
 	var roll := randf()
+	if force_bonus == "kanpai":
+		roll = 0.0
+	elif force_bonus == "buddy":
+		roll = KANPAI_CHANCE
 	if roll < KANPAI_CHANCE:
 		bonus = "kanpai"
 		drinkers.clear()
@@ -459,7 +468,7 @@ func _show_reveal() -> void:
 	face_view.queue_redraw()
 
 	# on a table, turn the card to face whoever has to drink
-	var flip: bool = table_mode and seat_centers[drinkers[0]].y < koma.position.y - 1.0
+	var flip: bool = table_mode and seat_centers[drinkers[0]].y < koma_root.position.y - 1.0
 	reveal_card.rotation = PI if flip else 0.0
 	reveal_card.scale = Vector2(0.2, 0.2)
 	reveal_card.modulate.a = 0.0
@@ -542,11 +551,20 @@ func _layout() -> void:
 	var seat_r := minf(view.x * 0.5 - 90.0, view.y * 0.3)
 	if names.size() == 2:
 		seat_r = minf(view.y * 0.26, 330.0)  # face to face, a little further apart
+	var table_r := minf(view.x * 0.5 - 90.0, view.y * 0.3) - 24.0
+	var koma_scale := 1.0
+	if state == State.TITLE:
+		# a smaller table between the title and the buttons
+		center = Vector2(view.x * 0.5, view.y * 0.5)
+		table_r = minf(view.x * 0.24, view.y * 0.14)
+		koma_scale = table_r / 230.0
 	table.view = view
 	table.center = center
-	table.radius = minf(view.x * 0.5 - 90.0, view.y * 0.3) - 24.0
+	table.radius = table_r
+	table.koma_shadow = 110.0 * koma_scale
 	table.queue_redraw()
-	koma.position = center
+	koma_root.position = center
+	koma_root.scale = Vector2.ONE * koma_scale
 	for i in names.size():
 		var a := _seat_angle(i)
 		seat_centers[i] = center + Vector2.from_angle(a) * seat_r
@@ -649,6 +667,11 @@ func _set_count(n: int) -> void:
 		name_edits[i].visible = i < player_count
 
 
+func _on_toggle(key: String, on: bool) -> void:
+	sfx.click()
+	_set_option(key, on)
+
+
 func _set_option(key: String, on: bool) -> void:
 	match key:
 		"declare":
@@ -661,7 +684,9 @@ func _set_option(key: String, on: bool) -> void:
 		"vibe":
 			vibe_on = on
 	if toggles.has(key):
-		toggles[key].set_pressed_no_signal(on)
+		var t: Button = toggles[key]
+		t.set_pressed_no_signal(on)
+		t.text = ("● " if on else "○ ") + str(TOGGLE_LABELS[key])
 	_save()
 
 
@@ -759,15 +784,13 @@ func _build_setup() -> Control:
 	box.add_child(UI.spacer(6))
 	var opts := GridContainer.new()
 	opts.columns = 2
-	opts.add_theme_constant_override("h_separation", 24)
+	opts.add_theme_constant_override("h_separation", 16)
+	opts.add_theme_constant_override("v_separation", 12)
 	opts.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var labels := {"declare": "指名モード", "table": "向かい合わせ", "sound": "効果音", "vibe": "バイブ"}
 	var values := {"declare": declare_mode, "table": table_mode, "sound": sound_on, "vibe": vibe_on}
-	for key: String in labels:
-		var c := CheckButton.new()
-		c.text = labels[key]
-		c.button_pressed = values[key]
-		c.toggled.connect(func(on: bool): _set_option(key, on))
+	for key: String in TOGGLE_LABELS:
+		var c := UI.toggle(TOGGLE_LABELS[key], values[key])
+		c.toggled.connect(func(on: bool): _on_toggle(key, on))
 		opts.add_child(c)
 		toggles[key] = c
 	box.add_child(opts)
@@ -924,7 +947,6 @@ func _fill_banzuke() -> void:
 func _build_water() -> void:
 	var parts := UI.overlay(self, WATER_COLOR, 560)
 	water_layer = parts[0]
-	water_card = parts[1]
 	var box: VBoxContainer = parts[3]
 	var glass := WaterGlass.new()
 	glass.custom_minimum_size = Vector2(160, 190)
@@ -953,7 +975,7 @@ func _open_overlay(layer: Control) -> void:
 		overlay.visible = false
 	overlay = layer
 	layer.visible = true
-	var card: Control = layer.get_child(1).get_child(0)
+	var card: Control = layer.get_child(1)  # the centring holder, see UI.overlay
 	card.scale = Vector2(0.85, 0.85)
 	card.modulate.a = 0.0
 	var tw := create_tween().set_parallel()

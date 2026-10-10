@@ -89,6 +89,26 @@ static func button(text: String, font_size: int, min_width := 320) -> Button:
 	return b
 
 
+## A big on/off button for settings: lacquer red when on, dark when off.
+static func toggle(text: String, on: bool) -> Button:
+	var b := Button.new()
+	b.toggle_mode = true
+	b.button_pressed = on
+	b.custom_minimum_size = Vector2(300, 76)
+	b.add_theme_font_size_override("font_size", 28)
+	var off_style := box(Color("#2a2140"), Color(GOLD, 0.35), 3, 22)
+	var on_style := box(LACQUER, GOLD, 4, 22)
+	b.add_theme_stylebox_override("normal", off_style)
+	b.add_theme_stylebox_override("hover", off_style)
+	b.add_theme_stylebox_override("pressed", on_style)
+	b.add_theme_stylebox_override("hover_pressed", on_style)
+	b.add_theme_color_override("font_color", Color(CREAM, 0.55))
+	b.add_theme_color_override("font_hover_color", Color(CREAM, 0.55))
+	b.text = ("● " if on else "○ ") + text
+	b.toggled.connect(func(pressed: bool): b.text = ("● " if pressed else "○ ") + text)
+	return b
+
+
 static func spacer(height: int) -> Control:
 	var c := Control.new()
 	c.custom_minimum_size = Vector2(0, height)
@@ -133,7 +153,9 @@ static func hbox(separation := 16) -> HBoxContainer:
 	return h
 
 
-## A dimmed full-screen layer with a centred card; returns [layer, card, style, content].
+## A dimmed full-screen layer with a centred card; returns [layer, holder, style,
+## content]. Animate or rotate the holder: containers reset their children's
+## rotation and scale whenever they lay out, so the card itself can't keep them.
 static func overlay(parent: Node, bg: Color, min_width := 600) -> Array:
 	var layer := full_rect(parent)
 	var dim := ColorRect.new()
@@ -143,6 +165,7 @@ static func overlay(parent: Node, bg: Color, min_width := 600) -> Array:
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.resized.connect(func(): center.pivot_offset = center.size / 2)
 	layer.add_child(center)
 	var card := PanelContainer.new()
 	var style := box(bg, GOLD, 6, 40)
@@ -151,10 +174,9 @@ static func overlay(parent: Node, bg: Color, min_width := 600) -> Array:
 	style.shadow_size = 18
 	card.add_theme_stylebox_override("panel", style)
 	card.custom_minimum_size = Vector2(min_width, 0)
-	card.resized.connect(func(): card.pivot_offset = card.size / 2)
 	center.add_child(card)
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", 10)
 	card.add_child(content)
 	layer.visible = false
-	return [layer, card, style, content]
+	return [layer, center, style, content]

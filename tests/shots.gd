@@ -69,6 +69,23 @@ func _ready() -> void:
 	game.drink()
 
 	game.set_option("declare", false)
+	game.set_option("table", false)
+	game.open_setup(4)
+	game.start_play()
+	game.force_bonus = "kanpai"
+	game.spin_with(30.0)
+	await _until_reveal()
+	await _settle(0.8)
+	await _shot("12_kanpai")
+	game.drink()
+	game.force_bonus = "buddy"
+	game.spin_with(30.0)
+	await _until_reveal()
+	await _settle(0.8)
+	await _shot("13_buddy")
+	game.drink()
+	game.force_bonus = ""
+
 	game.set_option("table", true)
 	game.open_setup(6)
 	game.start_play()

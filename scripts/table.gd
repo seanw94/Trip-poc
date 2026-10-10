@@ -9,6 +9,7 @@ var view := Vector2(720, 1280)
 var center := Vector2(360, 590)
 var radius := 250.0
 var show_table := true
+var koma_shadow := 110.0
 
 
 func _draw() -> void:
@@ -27,7 +28,7 @@ func _draw() -> void:
 	draw_arc(center, radius - 30, 0, TAU, 96, Color(UI.GOLD, 0.35), 2, true)
 	for i in 24:
 		draw_circle(center + Vector2.from_angle(TAU * i / 24.0) * (radius - 8), 2.5, Color(UI.GOLD, 0.7))
-	draw_circle(center + Vector2(8, 16), 110, Color(0, 0, 0, 0.35))
+	draw_circle(center + Vector2(8, 16) * koma_shadow / 110.0, koma_shadow, Color(0, 0, 0, 0.35))
 
 
 func _seigaiha(area: Rect2) -> void:
