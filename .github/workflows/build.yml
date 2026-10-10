@@ -5,9 +5,18 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  GODOT_VERSION: "4.4.1"
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # publishes screenshots to the ci-screenshots branch
     steps:
       - uses: actions/checkout@v4
 
@@ -16,23 +25,112 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      # No wrapper jar committed: setup-gradle installs a pinned Gradle instead,
-      # so nothing binary has to live in the repo.
-      - uses: gradle/actions/setup-gradle@v4
+      # Godot plus only its Android export templates (the full .tpz is ~1 GB).
+      - uses: actions/cache@v4
+        id: godot-cache
         with:
-          gradle-version: "8.11.1"
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-android
 
-      - name: Build debug APK
-        run: gradle assembleDebug --no-daemon
+      - name: Download Godot
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          mkdir -p ~/godot/templates
+          cd ~/godot
+          curl -fsSL -o godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip && rm godot.zip
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" godot
+          curl -fsSL -o templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -j templates.tpz templates/android_debug.apk templates/android_release.apk templates/version.txt -d templates
+          rm templates.tpz
 
-      # Should print the same SHA-256 on every run (the committed debug key).
+      - name: Set up Godot
+        run: |
+          echo "$HOME/godot" >> "$GITHUB_PATH"
+          tpl="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$tpl" && cp ~/godot/templates/* "$tpl/"
+          # Editor settings: SDK, JDK and the repo's fixed debug key for signing.
+          mkdir -p ~/.config/godot
+          for name in "editor_settings-${GODOT_VERSION%.*}.tres" "editor_settings-4.tres"; do
+            cat > ~/.config/godot/"$name" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_HOME"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = "$GITHUB_WORKSPACE/signing/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EOF
+          done
+
+      # The run number becomes the Android versionCode, so every build installs
+      # as an update, and the title screen shows which build you're on.
+      - name: Stamp version
+        run: |
+          v="1.0.${GITHUB_RUN_NUMBER}"
+          sed -i "s/^version\/code=.*/version\/code=${GITHUB_RUN_NUMBER}/; s/^version\/name=.*/version\/name=\"${v}\"/" export_presets.cfg
+          sed -i "s/^config\/version=.*/config\/version=\"${v}\"/" project.godot
+          grep -E "^version/|^config/version" export_presets.cfg project.godot
+
+      - name: Import project
+        run: |
+          timeout 300 godot --headless --path . --import 2>&1 | tee import.log
+          if grep -E "SCRIPT ERROR|Parse Error" import.log; then exit 1; fi
+
+      # Plays group, 指名 and two-player rounds headless; fails on any script error.
+      - name: Smoke test
+        run: |
+          timeout 240 godot --headless --path . res://tests/smoke.tscn 2>&1 | tee smoke.log
+          grep -q "SMOKE OK" smoke.log
+          if grep -E "SCRIPT ERROR|Parse Error|ERROR:" smoke.log; then exit 1; fi
+
+      - name: Export APK
+        run: |
+          mkdir -p build
+          timeout 600 godot --headless --path . --export-debug "Android" build/bekuhai.apk 2>&1 | tee export.log
+          test -f build/bekuhai.apk
+
+      # Same SHA-256 every build (the committed debug key), so updates install.
       - name: Show signing certificate
         run: |
           apksigner=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
-          "$apksigner" verify --print-certs app/build/outputs/apk/debug/app-debug.apk
+          "$apksigner" verify --print-certs build/bekuhai.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: tanuki-poc-debug
-          path: app/build/outputs/apk/debug/*.apk
+          name: bekuhai-apk
+          path: build/bekuhai.apk
           retention-days: 14
+
+      # Real rendering (software OpenGL under a virtual display) of the main
+      # screens, for checking the look without a phone.
+      - name: Render screenshots
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
+          xvfb-run -a -s "-screen 0 1080x1920x24" \
+            timeout 300 godot --path . --rendering-driver opengl3 res://tests/shots.tscn -- --out "$PWD/shots" 2>&1 | tee shots.log
+          ls -la shots
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: shots/*.png
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Publish screenshots to the ci-screenshots branch
+        if: always()
+        continue-on-error: true
+        run: |
+          test -n "$(ls shots/*.png 2>/dev/null)" || exit 0
+          cp shots.log shots/ 2>/dev/null || true
+          cd shots
+          git init -q -b ci-screenshots
+          git add .
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" \
+            commit -q -m "Screenshots for ${GITHUB_SHA}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" ci-screenshots

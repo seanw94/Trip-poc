@@ -1,6 +1,7 @@
 extends Node
 ## Tiny synthesized sound kit, so the game ships no audio files: spin ticks,
-## a taiko "don", a shamisen-ish fanfare, a whoosh and a sake-cup clink.
+## a taiko "don", hand claps for the chant, a shamisen-ish fanfare, a whoosh
+## and a sake-cup clink.
 
 const RATE := 22050
 # yo-scale run (D E G A B D) for the fanfare
@@ -12,6 +13,8 @@ var _don: AudioStreamWAV
 var _fanfare: AudioStreamWAV
 var _whoosh: AudioStreamWAV
 var _clink: AudioStreamWAV
+var _clap: AudioStreamWAV
+var enabled := true
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
 
@@ -22,7 +25,8 @@ func _ready() -> void:
 	_fanfare = _make(FANFARE_GAP * (FANFARE_NOTES.size() - 1) + 0.7, _fanfare_sample)
 	_whoosh = _make(0.45, func(t: float) -> float: return randf_range(-1.0, 1.0) * sin(PI * t / 0.45) * 0.45)
 	_clink = _make(0.5, _clink_sample)
-	for i in 6:
+	_clap = _make(0.12, _clap_sample)
+	for i in 8:
 		var p := AudioStreamPlayer.new()
 		add_child(p)
 		_players.append(p)
@@ -48,11 +52,29 @@ func whoosh() -> void:
 	_play(_whoosh, 1.0, -8.0)
 
 
+func clap() -> void:
+	_play(_clap, randf_range(0.9, 1.1), -5.0)
+
+
+func beat_don() -> void:
+	_play(_don, 1.35, -11.0)
+
+
+func roll() -> void:
+	_play(_tick, 1.5, -3.0)
+
+
+func thud() -> void:
+	_play(_don, 0.75, -2.0)
+
+
 func clink() -> void:
 	_play(_clink, randf_range(0.95, 1.05), -3.0)
 
 
 func _play(stream: AudioStreamWAV, pitch: float, volume_db: float) -> void:
+	if not enabled:
+		return
 	var p := _players[_next]
 	_next = (_next + 1) % _players.size()
 	p.stream = stream
@@ -82,6 +104,12 @@ func _don_sample(t: float) -> float:
 	var body := sin(phase) * exp(-t * 5.0)
 	var slap := randf_range(-1.0, 1.0) * exp(-t * 60.0) * 0.5
 	return (body + slap) * 0.9
+
+
+func _clap_sample(t: float) -> float:
+	# two quick noise bursts, like a pair of hands slightly out of sync
+	var env := exp(-t * 70.0) + 0.6 * exp(-maxf(t - 0.012, 0.0) * 70.0) * float(t > 0.012)
+	return randf_range(-1.0, 1.0) * env * 0.6
 
 
 func _clink_sample(t: float) -> float:
