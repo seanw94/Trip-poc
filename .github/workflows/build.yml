@@ -157,12 +157,10 @@ jobs:
     timeout-minutes: 25
     permissions:
       contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        # The emulator's default SwiftShader GL has a uniform limit too low for
-        # Godot's canvas shader; try the other GPU back ends as well.
-        gpu: [swiftshader_indirect, angle_indirect, guest]
+    env:
+      # The emulator's default SwiftShader GL has a uniform limit too low for
+      # Godot's canvas shader (grey screen); ANGLE renders it like a phone does.
+      GPU: angle_indirect
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -181,7 +179,7 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_6
-          emulator-options: -no-window -gpu ${{ matrix.gpu }} -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-window -gpu ${{ env.GPU }} -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
             mkdir -p android
@@ -205,7 +203,7 @@ jobs:
         continue-on-error: true
         run: |
           test -f android/android_title.png || exit 0
-          gpu="${{ matrix.gpu }}"
+          gpu="$GPU"
           for attempt in 1 2 3 4 5; do
             rm -rf pub
             git clone -q --depth 1 -b ci-screenshots "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" pub
