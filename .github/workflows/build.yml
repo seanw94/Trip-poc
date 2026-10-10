@@ -157,6 +157,12 @@ jobs:
     timeout-minutes: 25
     permissions:
       contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        # The emulator's default SwiftShader GL has a uniform limit too low for
+        # Godot's canvas shader; try the other GPU back ends as well.
+        gpu: [swiftshader_indirect, angle_indirect, guest]
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -174,6 +180,8 @@ jobs:
           api-level: 34
           arch: x86_64
           target: google_apis
+          profile: pixel_6
+          emulator-options: -no-window -gpu ${{ matrix.gpu }} -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
             mkdir -p android
@@ -197,11 +205,13 @@ jobs:
         continue-on-error: true
         run: |
           test -f android/android_title.png || exit 0
-          git clone -q --depth 1 -b ci-screenshots "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" pub
-          cp android/android_title.png pub/
-          grep -iE "godot|bekuhai|FATAL|AndroidRuntime" android/logcat.txt | tail -200 > pub/android_logcat.txt || true
-          cd pub
-          git add .
-          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" \
-            commit -q -m "Emulator launch for ${GITHUB_SHA}"
-          git push -q origin ci-screenshots
+          gpu="${{ matrix.gpu }}"
+          for attempt in 1 2 3 4 5; do
+            rm -rf pub
+            git clone -q --depth 1 -b ci-screenshots "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" pub
+            cp android/android_title.png "pub/android_${gpu}.png"
+            grep -iE "godot|bekuhai|FATAL|AndroidRuntime" android/logcat.txt | tail -200 > "pub/android_${gpu}_logcat.txt" || true
+            (cd pub && git add . && git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" \
+              commit -q -m "Emulator launch (${gpu}) for ${GITHUB_SHA}" && git push -q origin ci-screenshots) && break
+            sleep $((attempt * 3))
+          done
