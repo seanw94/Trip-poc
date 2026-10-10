@@ -459,7 +459,7 @@ func _show_reveal() -> void:
 	face_view.queue_redraw()
 
 	# on a table, turn the card to face whoever has to drink
-	var flip := table_mode and seat_centers[drinkers[0]].y < koma.position.y - 1.0
+	var flip: bool = table_mode and seat_centers[drinkers[0]].y < koma.position.y - 1.0
 	reveal_card.rotation = PI if flip else 0.0
 	reveal_card.scale = Vector2(0.2, 0.2)
 	reveal_card.modulate.a = 0.0
