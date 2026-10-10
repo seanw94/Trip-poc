@@ -1,0 +1,85 @@
+10-10 02:55:55.492   518   797 I SdkSandboxManager: No SDKs used. Skipping SDK data reconcilation for CallingInfo{mUid=10192, mPackageName='com.seanw94.bekuhai, mAppProcessToken='null'}
+10-10 02:55:55.504   518   518 V GameManagerService_GamePackageConfiguration: No android.game_mode_config meta-data found for package com.seanw94.bekuhai
+10-10 02:55:55.572   518   518 V GameManagerService: Package configuration not found for com.seanw94.bekuhai
+10-10 02:55:55.636  3212  3212 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-10 02:55:55.687  3212  3212 I AndroidRuntime: Using default boot image
+10-10 02:55:55.687  3212  3212 I AndroidRuntime: Leaving lock profiling enabled
+10-10 02:55:55.894  3212  3212 D AndroidRuntime: Calling main entry com.android.commands.monkey.Monkey
+10-10 02:55:55.894  3212  3212 W Monkey  : args: [-p, com.seanw94.bekuhai, -c, android.intent.category.LAUNCHER, 1]
+10-10 02:55:55.895  3212  3212 W Monkey  :  arg: "com.seanw94.bekuhai"
+10-10 02:55:55.895  3212  3212 W Monkey  : data="com.seanw94.bekuhai"
+10-10 02:55:56.139   518  1858 V SplashScreenExceptionList: SplashScreen checking exception for package com.seanw94.bekuhai (target sdk:34) -> false
+10-10 02:55:56.214   826   859 V WindowManagerShell: Transition requested: android.os.BinderProxy@694f450 TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=8 displayId=0 isRunning=true baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.seanw94.bekuhai/com.godot.game.GodotApp } baseActivity=ComponentInfo{com.seanw94.bekuhai/com.godot.game.GodotApp} topActivity=ComponentInfo{com.seanw94.bekuhai/com.godot.game.GodotApp} origActivity=null realActivity=ComponentInfo{com.seanw94.bekuhai/com.godot.game.GodotApp} numActivities=1 lastActiveTime=27661 supportsMultiWindow=true resizeMode=2 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@5bc9649} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 128 - 0, 0) topActivityInfo=ActivityInfo{c8c6b4e com.godot.game.GodotApp} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
+10-10 02:55:56.227   518  1858 I ActivityTaskManager: START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.seanw94.bekuhai/com.godot.game.GodotApp} with LAUNCH_SINGLE_INSTANCE_PER_TASK from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
+10-10 02:55:56.252   518  2016 D CoreBackPreview: Window{a14d60 u0 Splash Screen com.seanw94.bekuhai}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@ecefeea, mPriority=0, mIsAnimationCallback=false}
+10-10 02:55:56.433  3212  3212 I AndroidRuntime: VM exiting with result code 0.
+10-10 02:55:56.454  3345  3345 I seanw94.bekuhai: Late-enabling -Xcheck:jni
+10-10 02:55:56.457   518   547 I ActivityManager: Start proc 3345:com.seanw94.bekuhai/u0a192 for next-top-activity {com.seanw94.bekuhai/com.godot.game.GodotApp}
+10-10 02:55:56.465  3345  3345 I seanw94.bekuhai: Using CollectorTypeCC GC.
+10-10 02:55:56.465  3345  3345 W seanw94.bekuhai: Unexpected CPU variant for x86: x86_64.
+10-10 02:55:56.465  3345  3345 W seanw94.bekuhai: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+10-10 02:55:56.537  1037  1037 D CarrierSvcBindHelper: onPackageAdded: com.seanw94.bekuhai
+10-10 02:55:56.539  1037  1354 D ImsResolver: maybeAddedImsService, packageName: com.seanw94.bekuhai
+10-10 02:55:56.587   518   535 V WindowManager: Sent Transition #8 createdAt=10-10 02:55:56.063 via request=TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=8 displayId=0 isRunning=true baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.seanw94.bekuhai/com.godot.game.GodotApp } baseActivity=ComponentInfo{com.seanw94.bekuhai/com.godot.game.GodotApp} topActivity=ComponentInfo{com.seanw94.bekuhai/com.godot.game.GodotApp} origActivity=null realActivity=ComponentInfo{com.seanw94.bekuhai/com.godot.game.GodotApp} numActivities=1 lastActiveTime=27661 supportsMultiWindow=true resizeMode=2 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{eac3a2 Task{8b9b071 #8 type=standard A=10192:com.seanw94.bekuhai}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 128 - 0, 0) topActivityInfo=ActivityInfo{cdcd833 com.godot.game.GodotApp} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
+10-10 02:55:56.587   518   535 V WindowManager:     info={id=8 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{RemoteToken{eac3a2 Task{8b9b071 #8 type=standard A=10192:com.seanw94.bekuhai}}} m=OPEN f=NONE leash=Surface(name=Task=8)/@0x57a15d8 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0},{WCT{RemoteToken{e59c7f0 Task{eb74c69 #1 type=home}}} m=TO_BACK f=SHOW_WALLPAPER leash=Surface(name=Task=1)/@0xe2794a3 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0}]}
+10-10 02:55:56.665  3345  3345 W ziparchive: Unable to open '/data/app/~~FT1pQJpJTEaMPWkyjgW2LA==/com.seanw94.bekuhai-4oMW0CivSs1eT7089IDnsA==/base.dm': No such file or directory
+10-10 02:55:56.665  3345  3345 W ziparchive: Unable to open '/data/app/~~FT1pQJpJTEaMPWkyjgW2LA==/com.seanw94.bekuhai-4oMW0CivSs1eT7089IDnsA==/base.dm': No such file or directory
+10-10 02:55:56.720   828   828 I SafetyLabelChangedBroadcastReceiver: received broadcast packageName: com.seanw94.bekuhai, current user: UserHandle{0}, packageChangeEvent: NEW_INSTALL, intent user: UserHandle{0}
+10-10 02:55:56.796  3345  3345 D nativeloader: Configuring clns-6 for other apk /data/app/~~FT1pQJpJTEaMPWkyjgW2LA==/com.seanw94.bekuhai-4oMW0CivSs1eT7089IDnsA==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~FT1pQJpJTEaMPWkyjgW2LA==/com.seanw94.bekuhai-4oMW0CivSs1eT7089IDnsA==/lib/x86_64:/data/app/~~FT1pQJpJTEaMPWkyjgW2LA==/com.seanw94.bekuhai-4oMW0CivSs1eT7089IDnsA==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/com.seanw94.bekuhai
+10-10 02:55:56.904  3345  3345 V GraphicsEnvironment: ANGLE GameManagerService for com.seanw94.bekuhai: false
+10-10 02:55:56.904  3345  3345 V GraphicsEnvironment: com.seanw94.bekuhai is not listed in per-application setting
+10-10 02:55:57.064  1037  1037 D CarrierSvcBindHelper: onPackageModified: com.seanw94.bekuhai
+10-10 02:55:57.330  3345  3345 D GodotActivity: Starting intent Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.seanw94.bekuhai/com.godot.game.GodotApp } with parameters null
+10-10 02:55:57.344  3345  3345 V GodotActivity: Creating new Godot fragment instance.
+10-10 02:55:57.409  3345  3345 V Godot   : OnCreate: GodotFragment{148b594} (ab40089a-7f7d-4e61-8627-a1a643b3faad id=0x7f070033)
+10-10 02:55:57.409  3345  3345 V Godot   : Initializing Godot plugin registry
+10-10 02:55:57.418  3345  3345 I GodotPluginRegistry: Registering runtime plugin AndroidRuntime
+10-10 02:55:57.426  3345  3345 V Godot   : OnInitNativeLayer: GodotFragment{148b594} (ab40089a-7f7d-4e61-8627-a1a643b3faad id=0x7f070033)
+10-10 02:55:57.435  3345  3345 V Godot   : Godot native layer initialization completed: true
+10-10 02:55:57.519  1037  1354 D ImsResolver: maybeAddedImsService, packageName: com.seanw94.bekuhai
+10-10 02:55:57.541  3345  3345 V Godot   : Godot native layer setup completed
+10-10 02:55:57.545  3345  3345 V Godot   : OnInitRenderView: GodotFragment{148b594} (ab40089a-7f7d-4e61-8627-a1a643b3faad id=0x7f070033)
+10-10 02:55:57.654  3345  3345 D Godot   : usesVulkan(): false
+10-10 02:55:57.654  3345  3345 D Godot   : 			renderingDevice: opengl3 (ProjectSettings)
+10-10 02:55:57.654  3345  3345 D Godot   : 			renderer: gl_compatibility (ProjectSettings)
+10-10 02:55:57.676  3345  3345 V Godot   : OnStart: GodotFragment{148b594} (ab40089a-7f7d-4e61-8627-a1a643b3faad id=0x7f070033)
+10-10 02:55:57.677  3345  3345 V Godot   : OnResume: GodotFragment{148b594} (ab40089a-7f7d-4e61-8627-a1a643b3faad id=0x7f070033)
+10-10 02:55:57.803   518  1099 D CoreBackPreview: Window{acfe7fb u0 com.seanw94.bekuhai/com.godot.game.GodotApp}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@bdc645f, mPriority=0, mIsAnimationCallback=false}
+10-10 02:55:57.912  3345  3458 I godot   : Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+10-10 02:55:58.170   518   535 W ziparchive: Unable to open '/data/app/~~FT1pQJpJTEaMPWkyjgW2LA==/com.seanw94.bekuhai-4oMW0CivSs1eT7089IDnsA==/base.dm': No such file or directory
+10-10 02:55:58.171   518  1099 W InputManager-JNI: Input channel object 'a14d60 Splash Screen com.seanw94.bekuhai (client)' was disposed without first being removed with the input manager!
+10-10 02:55:58.172   518  2517 D CoreBackPreview: Window{a14d60 u0 Splash Screen com.seanw94.bekuhai EXITING}: Setting back callback null
+10-10 02:55:58.175   518   535 I ActivityTaskManager: Displayed com.seanw94.bekuhai/com.godot.game.GodotApp for user 0: +2s73ms
+10-10 02:55:58.294   518  2007 I ImeTracker: com.seanw94.bekuhai:7a619e72: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+10-10 02:55:58.295   518  2007 I ImeTracker: com.seanw94.bekuhai:7a619e72: onCancelled at PHASE_SERVER_SHOULD_HIDE
+10-10 02:55:58.343  1526  1526 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x0 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=com.seanw94.bekuhai fieldId=0 fieldName=null extras=null}, false)
+10-10 02:55:58.894  3345  3469 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(wmsSync-VRI[GodotApp]#1) as ready
+10-10 02:55:58.894  3345  3469 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(VRI[GodotApp]#2) as ready
+10-10 02:55:58.895  3345  3469 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(SurfaceView[com.seanw94.bekuhai/com.godot.game.GodotApp]#0) as ready
+10-10 02:55:59.323  3345  3458 I godot   : OpenGL API OpenGL ES 3.1 (OpenGL ES 3.1.0 (ANGLE 2.1.17841 git hash: 5fa2e61da947)) - Compatibility - Using Device: Google (Google Inc. (Mesa)) - Android Emulator OpenGL ES Translator (ANGLE (Mesa, Vulkan 1.4.318 (llvmpipe (LLVM 21.0.0 256 bits) (0x00000000)), llvmpipe-25.2.4))
+10-10 02:55:59.354  3345  3458 D seanw94.bekuhai: PlayerBase::PlayerBase()
+10-10 02:55:59.355  3345  3458 D seanw94.bekuhai: TrackPlayerBase::TrackPlayerBase()
+10-10 02:55:59.414  3345  3458 I godot   : 
+10-10 02:56:00.478   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{16c55c9 com.google.android.googlequicksearchbox/10132} BLOCKED
+10-10 02:56:00.479   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{fb9f4ce com.google.android.gm/10142} BLOCKED
+10-10 02:56:00.480   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{182fef com.google.android.dialer/10128} BLOCKED
+10-10 02:56:00.480   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{ac16afc com.google.android.contacts/10155} BLOCKED
+10-10 02:56:00.480   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{ddb8585 com.google.android.apps.youtube.music/10156} BLOCKED
+10-10 02:56:00.480   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{3048fda com.google.android.cellbroadcastreceiver/10176} BLOCKED
+10-10 02:56:00.735  3345  3458 V Godot   : OnGodotSetupCompleted
+10-10 02:56:01.034  3345  3458 V Godot   : OnGodotMainLoopStarted
+10-10 02:56:01.580   518  2007 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{b502c94 com.google.android.gm/10142} BLOCKED
+10-10 02:56:02.132  1566  1566 I AiAiEcho: AppFetcherImplV2 updateApps package:[com.seanw94.bekuhai], userId:[0], reason:[package is added.].
+10-10 02:56:02.447  1566  1566 I AiAiEcho: AppFetcherImpl onPackageChanged com.seanw94.bekuhai.
+10-10 02:56:02.457  1566  2376 I AiAiEcho: AppIndexer Package:[com.seanw94.bekuhai] UserProfile:[0] Enabled:[true].
+10-10 02:56:02.457  1566  2376 I AiAiEcho: AppFetcherImplV2 updateApps package:[com.seanw94.bekuhai], userId:[0], reason:[package is updated.].
+10-10 02:56:04.697   518  1240 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{c31e7d8 com.google.android.settings.intelligence/10118} BLOCKED
+10-10 02:56:04.704   518  2122 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{ef3b731 com.google.android.settings.intelligence/10118} BLOCKED
+10-10 02:56:06.468  1446  3159 I BlockstoreStorage: Clearing Blockstore Data for package com.seanw94.bekuhai [CONTEXT service_id=258 ]
+10-10 02:56:10.494   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{2a7f680 com.google.android.googlequicksearchbox/10132} BLOCKED
+10-10 02:56:10.494   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{59f24b9 com.google.android.apps.messaging/10129} BLOCKED
+10-10 02:56:10.494   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{20930fe com.android.camera2/10146} BLOCKED
+10-10 02:56:10.494   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{d4b705f com.google.android.gm/10142} BLOCKED
+10-10 02:56:10.494   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{dd5faac com.google.android.devicelockcontroller/10170} BLOCKED
+10-10 02:56:10.496   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{3845375 com.google.android.rkpdapp/10184} BLOCKED
+10-10 02:56:10.496   518   571 I AppsFilter: interaction: PackageSetting{b3601d0 com.seanw94.bekuhai/10192} -> PackageSetting{95eb627 com.google.android.projection.gearhead/10123} BLOCKED
